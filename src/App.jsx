@@ -6,7 +6,8 @@ const App = () => {
   const [cityName, setCityName] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [recentSearches, setRecentSearches] = useState([]); 
+  const [recentSearches, setRecentSearches] = useState([]);
+  const [temperature, setTemperature] = useState("C");
 
   const fetchData = async (e) => {
     if (e.key === "Enter") {
@@ -16,7 +17,7 @@ const App = () => {
         setWeatherData(data);
         setCityName("");
         setError(null);
-        setRecentSearches((prevSearches) => [cityName, ...prevSearches]); 
+        setRecentSearches((prevSearches) => [cityName, ...prevSearches]);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -39,6 +40,11 @@ const App = () => {
     }
   };
 
+  const switchTemperature = () => {
+    const newTemperature = temperature === "C" ? "F" : "C";
+    setTemperature(newTemperature);
+  };
+
   return (
     <div>
       <input
@@ -48,6 +54,9 @@ const App = () => {
         onChange={(e) => setCityName(e.target.value)}
         onKeyDown={fetchData}
       />
+      <button onClick={switchTemperature}>
+        Switch Temperature (Celsius/Fahrenheit)
+      </button>
       {loading && <div>Loading...</div>}
       {error && <div style={{ color: "red" }}>{error}</div>}
       {weatherData && (
@@ -57,8 +66,10 @@ const App = () => {
             {weatherData.location.country}
           </h2>
           <p>
-            Temperature: {weatherData.current.temp_c} °C (
-            {weatherData.current.temp_f} °F)
+            Temperature:
+             {temperature === "C"
+              ? ` ${weatherData.current.temp_c} °C`
+              : ` ${weatherData.current.temp_f} °F`}
           </p>
           <p>Condition: {weatherData.current.condition.text}</p>
           <img
