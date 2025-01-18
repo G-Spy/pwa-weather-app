@@ -5,21 +5,37 @@ const App = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [cityName, setCityName] = useState("");
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
+  const [recentSearches, setRecentSearches] = useState([]); 
 
   const fetchData = async (e) => {
     if (e.key === "Enter") {
-      setLoading(true); 
+      setLoading(true);
       try {
         const data = await fetchWeather(cityName);
         setWeatherData(data);
         setCityName("");
         setError(null);
+        setRecentSearches((prevSearches) => [cityName, ...prevSearches]); 
       } catch (error) {
         setError(error.message);
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
+    }
+  };
+
+  const recentSearchClick = async (city) => {
+    setLoading(true);
+    try {
+      const data = await fetchWeather(city);
+      setWeatherData(data);
+      setCityName("");
+      setError(null);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -54,6 +70,16 @@ const App = () => {
           <p>Visibility: {weatherData.current.vis_km}</p>
         </div>
       )}
+      <div>
+        <h3>Recent Searched Cities</h3>
+        <ul>
+          {recentSearches.map((city, index) => (
+            <li key={index} onClick={() => recentSearchClick(city)}>
+              {city}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
